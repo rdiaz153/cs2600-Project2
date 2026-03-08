@@ -76,8 +76,7 @@ Status load_file(AddressBook *address_book)
 				}
 				char *field;
 				if(i == 11)
-				{			
-						printf("got here\n");					
+				{					
 					field = start; // Last field, take the rest of the line
 					if(isdigit(field[0]))
 						address_book->list[address_book->count].si_no = atoi(field);
