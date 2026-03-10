@@ -150,10 +150,28 @@ Status search_contact(AddressBook *address_book)
 
 Status edit_contact(AddressBook *address_book)
 {
-	/* Add the functionality for edit contacts here */
+	//Check if there are contacts available
+
+	//Ask user which contact to edit
+
+	//Validate index
+
+	//Display current contact info
+
+	//Prompt for new values
+
+	//Confirm edit
 }
 
 Status delete_contact(AddressBook *address_book)
 {
-	/* Add the functionality for delete contacts here */
+	//Check if there are contacts available
+
+	//Ask which contact to delete
+
+	//Validate index
+
+	//Shift contacts up in the array
+
+	//Reduce total contact count
 }
