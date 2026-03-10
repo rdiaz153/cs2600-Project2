@@ -135,7 +135,59 @@ Status menu(AddressBook *address_book)
 
 Status add_contacts(AddressBook *address_book)
 {
-	/* Add the functionality for adding contacts here */
+	int index = address_book->count;
+	int option;
+	int capacity = 10; //temp variable for testing
+
+	
+	printf("0. Back\n"); //layout when add func gets called
+	printf("1. Name\n");
+	printf("2. Phone No\n");
+	printf("3. Email ID\n");
+	
+
+	printf("Please select an option: \n"); //user input to move forward
+	scanf("%d" , &option);
+	getchar();
+
+	if(address_book->count >= capacity){ //checks to see if there is enough space for user to add more contacts
+		printf("Maximum contaacts reached\n");
+		return e_fail;
+	}
+
+	if(option == 0){ //if option 0 returns back to menu
+		return e_back;
+	}
+	else if(option == 1){ //ask user to input name
+		printf("Enter the Name: ");
+		fgets(address_book->list[index].name[0], NAME_LEN, stdin);
+		
+	}
+	else if(option == 2){ // ask user to input phone no
+		printf("Enter the Phone Number 1: ");
+		fgets(address_book->list[index].phone_numbers[0], NUMBER_LEN, stdin); 	
+	}
+	else if(option == 3){ //ask user to input email address
+		printf("Enter the Email Address: ");
+		fgets(address_book->list[index].email_addresses[0], EMAIL_ID, stdin);
+
+	}
+	else{ // in case user puts other option than 0-3
+		printf("Please enter a valid option :");
+	}
+	
+
+	address_book->list[index].si_no = index + 1; // creates serial id for contact added 
+
+	address_book->count++; //increments every added contact 
+
+	
+	return e_success;
+
+	
+
+	
+	
 }
 
 Status search(const char *str, AddressBook *address_book, int loop_count, int field, const char *msg, Modes mode)
