@@ -175,7 +175,7 @@ Status edit_contact(AddressBook *address_book)
 	//Display current contact info
 	printf("\nCurrent Contact Details:\n");
 	printf("Name: %s\n", address_book->list[index].name[0]);
-	printf("Phone: %s\n", address_book->[index].phone_numbers[0]);
+	printf("Phone: %s\n", address_book->list[index].phone_numbers[0]);
 	printf("Email: %s\n", address_book->list[index].email_addresses[0]);
 
 	//Prompt for new values
