@@ -234,9 +234,92 @@ Status add_contacts(AddressBook *address_book)
 }
 
 Status search(const char *str, AddressBook *address_book, int loop_count, int field, const char *msg, Modes mode)
-{
-	/* Add the functionality for adding contacts here */
+{	
+	if(address_book->count == 0){ //if statement to see if address_book > 0 else return fail
+		printf("No contacts avaliable.\n");
+		return e_fail;
+	}
+
+    int found = 0;
+
+    
+    printf("\n===============================================================\n"); // ascii art for table 
+    printf(": S.No : Name                 : Phones             : Emails       :\n");
+    printf("===============================================================\n");
+
+    for(int i = 0; i < address_book->count; i++){
+        int match = 0;
+
+        
+        if(field == 1){ // if statement to see what user chooses to search by, name
+            if((mode == EXACT && strcasecmp(address_book->list[i].name[0], str) == 0) ||
+               (mode == PARTIAL && strcasestr(address_book->list[i].name[0], str) != NULL))
+                match = 1;
+        }
+        else if(field == 2){ // phone
+            for(int j = 0; j < PHONE_NUMBER_COUNT; j++){
+                if(strlen(address_book->list[i].phone_numbers[j]) > 0 &&
+                   ((mode == EXACT && strcmp(address_book->list[i].phone_numbers[j], str) == 0) ||
+                    (mode == PARTIAL && strstr(address_book->list[i].phone_numbers[j], str) != NULL))){
+                    match = 1;
+                    break;
+                }
+            }
+        }
+        else if(field == 3){ // email
+            for(int j = 0; j < EMAIL_ID_COUNT; j++){
+                if(strlen(address_book->list[i].email_addresses[j]) > 0 &&
+                   ((mode == EXACT && strcmp(address_book->list[i].email_addresses[j], str) == 0) ||
+                    (mode == PARTIAL && strstr(address_book->list[i].email_addresses[j], str) != NULL))){
+                    match = 1;
+                    break;
+                }
+            }
+        }
+        else if(field == 4){ // serial number
+            if(address_book->list[i].si_no == atoi(str))
+                match = 1;
+        }
+
+        
+        if(match){  // prints out info if match is found
+            found = 1;
+
+            
+            char phones[128] = ""; // gets all contacts phone nums
+            for(int j = 0; j < PHONE_NUMBER_COUNT; j++){
+                if(strlen(address_book->list[i].phone_numbers[j]) > 0){
+                    if(strlen(phones) > 0) strcat(phones, ", ");
+                    strcat(phones, address_book->list[i].phone_numbers[j]);
+                }
+            }
+
+           
+            char emails[256] = ""; //gtes all contacts email addy
+            for(int j = 0; j < EMAIL_ID_COUNT; j++){
+                if(strlen(address_book->list[i].email_addresses[j]) > 0){
+                    if(strlen(emails) > 0) strcat(emails, ", ");
+                    strcat(emails, address_book->list[i].email_addresses[j]);
+                }
+            }
+
+            printf(": %-4d : %-20s : %-18s : %-30s :\n", //prints all info avaliable for said contact
+                   address_book->list[i].si_no,
+                   address_book->list[i].name[0],
+                   phones,
+                   emails);
+        }
+    }
+
+    printf("===============================================================\n"); // last ascii art bit
+
+    if(!found) //if statement in case contact is not found
+        printf("No matching contact found.\n");
+
+    return e_success;
 }
+
+
 
 Status search_contact(AddressBook *address_book)
 {
