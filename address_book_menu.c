@@ -14,14 +14,17 @@
 
 int get_option(int type, const char *msg)
 {
-	/*
-	 * Mutilfuction user intractions like
-	 * Just an enter key detection
-	 * Read an number
-	 * Read a charcter
-	 */ 
+	int option; 
 
-	/* Fill the code to add above functionality */
+	if (msg && *msg)
+	{
+		printf("%s", msg);
+	}
+
+	scanf("%d", &option);
+
+	return option;
+
 }
 
 Status save_prompt(AddressBook *address_book)
@@ -66,7 +69,7 @@ void menu_header(const char *str)
 	system("clear");
 
 	printf("#######  Address Book  #######\n");
-	if (str != '\0')
+	if (str != NULL)
 	{
 		printf("#######  %s\n", str);
 	}
