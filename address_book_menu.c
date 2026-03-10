@@ -13,14 +13,32 @@
 
 int get_option(int type, const char *msg)
 {
-	/*
-	 * Mutilfuction user intractions like
-	 * Just an enter key detection
-	 * Read an number
-	 * Read a charcter
-	 */ 
+	char input[50];
+	int option;
 
-	/* Fill the code to add above functionality */
+	while(1){
+		if(msg){
+			printf("%s", msg);
+		}
+		fgets(input, sizeof(input), stdin);
+
+		if(type == 0){
+			return 0;
+		}
+		else if(type == 1){
+			if(sscanf(input, "%d", &option)==1){
+				return option;
+			}
+			else{
+				printf("Try again\n");
+			}
+		}
+		else if(type ==2){
+			return toupper(input[0]);
+		}
+
+		
+	}
 }
 
 Status save_prompt(AddressBook *address_book)
