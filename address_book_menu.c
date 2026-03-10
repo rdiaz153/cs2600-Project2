@@ -194,13 +194,36 @@ Status edit_contact(AddressBook *address_book)
 
 Status delete_contact(AddressBook *address_book)
 {
+	int index;
+
 	//Check if there are contacts available
+	if (address_book->count == 0)
+	{
+		printf("No contacts available to delete.\n");
+		scanf("%d", &index);
+	}
 
 	//Ask which contact to delete
+	printf("Enter the contact serial number to delete: ");
+	scanf("%d", &index);
 
 	//Validate index
+	if (index < 0 || index >= address_book->count)
+	{
+		printf("Invalid contact index.\n");
+		return e_fail;
+	}
 
 	//Shift contacts up in the array
+	for (int i = index; i < address_book->count - 1; i++)
+	{
+		address_book->list[i] = address_book->list[i + 1];
+	}
 
 	//Reduce total contact count
+	address_book->count--;
+
+	printf("Contact deleted successfully.\n");
+
+	return e_success;
 }
