@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include "address_book.h"
 #include "address_book_menu.h"
+#include "address_book_fops.h"
 
 //#include "abk_fileops.h"
 //#include "abk_log.h"
@@ -149,18 +150,46 @@ Status search_contact(AddressBook *address_book)
 }
 
 Status edit_contact(AddressBook *address_book)
-{
+{	
+
+	int index;
+
 	//Check if there are contacts available
+	if (address_book->count == 0) 
+	{
+		printf("No contacts available to edit.\n");
+		return e_fail;
+	}
 
 	//Ask user which contact to edit
+	printf("Enter the contact serial number to edit: ");
+	scanf("%d", &index);
 
 	//Validate index
+	if (index < 0 || index >= address_book->count)
+	{
+		printf("Invalid contact index. \n");
+		return e_fail;
+	}
 
 	//Display current contact info
+	printf("\nCurrent Contact Details:\n");
+	printf("Name: %s\n", address_book->list[index].name[0]);
+	printf("Phone: %s\n", address_book->[index].phone_numbers[0]);
+	printf("Email: %s\n", address_book->list[index].email_addresses[0]);
 
 	//Prompt for new values
+	printf("\nEnter new name: ");
+	scanf("%s", address_book->list[index].name[0]);
+
+	printf("Enter new phone number: ");
+	scanf("%s", address_book->list[index].phone_numbers[0]);
+
+	printf("Enter new email address: ");
+	scanf("%s", address_book->list[index].email_addresses[0]);
 
 	//Confirm edit
+	printf("Contact updated successfully.\n");
 }
 
 Status delete_contact(AddressBook *address_book)
