@@ -154,58 +154,83 @@ Status menu(AddressBook *address_book)
 Status add_contacts(AddressBook *address_book)
 {
 	int index = address_book->count;
-	int option;
+	
 	int capacity = 10; //temp variable for testing
 
-	
-	printf("0. Back\n"); //layout when add func gets called
-	printf("1. Name\n");
-	printf("2. Phone No\n");
-	printf("3. Email ID\n");
-	
-
-	printf("Please select an option: \n"); //user input to move forward
-	scanf("%d" , &option);
-	getchar();
-
-	if(address_book->count >= capacity){ //checks to see if there is enough space for user to add more contacts
-		printf("Maximum contaacts reached\n");
-		return e_fail;
-	}
-
-	if(option == 0){ //if option 0 returns back to menu
-		return e_back;
-	}
-	else if(option == 1){ //ask user to input name
-		printf("Enter the Name: ");
-		fgets(address_book->list[index].name[0], NAME_LEN, stdin);
+	while(1){
+		printf("0. Back\n"); //layout when add func gets called go back 
+		printf("1. Name    :%s\n", address_book->list[index].name[0][0] != '\0' ? address_book->list[index].name[0] : "" ); //name
 		
-	}
-	else if(option == 2){ // ask user to input phone no
-		printf("Enter the Phone Number 1: ");
-		fgets(address_book->list[index].phone_numbers[0], NUMBER_LEN, stdin); 	
-	}
-	else if(option == 3){ //ask user to input email address
-		printf("Enter the Email Address: ");
-		fgets(address_book->list[index].email_addresses[0], EMAIL_ID, stdin);
+		printf("2. Phone No(s): "); //phone number
+        for(int i = 0; i < PHONE_NUMBER_COUNT; i++) { //loop so it shows the current num of phone added so far
+            if(address_book->list[index].phone_numbers[i][0] != '\0') {
+                printf("%s ", address_book->list[index].phone_numbers[i]);
+            }
+        }
+        printf("\n");
 
-	}
-	else{ // in case user puts other option than 0-3
-		printf("Please enter a valid option :");
-	}
+		 printf("3. Email ID(s): "); //email addresses
+        for(int i = 0; i < EMAIL_ID_COUNT; i++) { // for loop so it shows the current num of email addresses added so far
+            if(address_book->list[index].email_addresses[i][0] != '\0') {
+                printf("%s ", address_book->list[index].email_addresses[i]);
+            }
+        }
+        printf("\n");
+		
+	
+		int option = get_option(NUM, "Please select an option: "); //get the input
+	
+	
+		if(address_book->count >= capacity){ //checks to see if there is enough space for user to add more contacts
+			printf("Maximum contacts reached\n");
+			return e_fail;
+		}
+	
+		if(option == 0){ //if option 0 returns back to menu
+			return e_back;
+		}
+		else if(option == 1){ //ask user to input name
+			printf("Enter the Name: ");
+			fgets(address_book->list[index].name[0], NAME_LEN, stdin);
+			printf("%s\n", address_book->list[index].name[0]);
+			address_book->list[index].si_no = index + 1; // creates serial id for contact added 
+			address_book->count++; //increments on every added contact 
+			
+		}
+		else if(option == 2){ // ask user to input phone no
+			for(int i = 0; i < PHONE_NUMBER_COUNT; i++){
+
+				if(address_book->list[index].phone_numbers[i][0] == '\0'){ //checks the total amount of phone no (5) to see if thers space
+					printf("Enter the Phone Number %d: ", i + 1);
+					fgets(address_book->list[index].phone_numbers[i], NUMBER_LEN, stdin);
+					break; //will only allow one contact per question
+				}
+			}
+		}
+		else if(option == 3){ //ask user to input email address
+			for(int i = 0; i < EMAIL_ID_COUNT ; i++){ //same loop, checks counter to see the is enough space for emails.
+				if(address_book->list[index].email_addresses[i][0] == '\0'){ 
+					printf("Enter the Email Address %d:  ", i+1);
+					fgets(address_book->list[index].email_addresses[i], EMAIL_ID_LEN, stdin);
+					break;
+				}
+				
+			}
+	
+		}
+		else{ // in case user puts other option than 0-3
+			printf("Please enter a valid option  (0-3) :");
+		}
 	
 
-	address_book->list[index].si_no = index + 1; // creates serial id for contact added 
-
-	address_book->count++; //increments every added contact 
-
+	
+	
+}
 	
 	return e_success;
 
 	
 
-	
-	
 }
 
 Status search(const char *str, AddressBook *address_book, int loop_count, int field, const char *msg, Modes mode)
