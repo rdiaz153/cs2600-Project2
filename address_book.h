@@ -31,6 +31,12 @@ typedef enum
 	e_list,
 } Modes;
 
+typedef enum
+{
+EXACT = 0,
+PARTIAL = 1
+} SearchMode;
+
 typedef enum 
 {
 	e_first_opt,
