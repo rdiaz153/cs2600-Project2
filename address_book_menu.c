@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include "address_book.h"
 #include "address_book_menu.h"
+#include "address_book_fops.h"
 
 #include "address_book_fops.h"
 //#include "abk_log.h"
@@ -13,14 +14,17 @@
 
 int get_option(int type, const char *msg)
 {
-	/*
-	 * Mutilfuction user intractions like
-	 * Just an enter key detection
-	 * Read an number
-	 * Read a charcter
-	 */ 
+	int option; 
 
-	/* Fill the code to add above functionality */
+	if (msg && *msg)
+	{
+		printf("%s", msg);
+	}
+
+	scanf("%d", &option);
+
+	return option;
+
 }
 
 Status save_prompt(AddressBook *address_book)
@@ -65,7 +69,7 @@ void menu_header(const char *str)
 	system("clear");
 
 	printf("#######  Address Book  #######\n");
-	if (str != '\0')
+	if (str != NULL)
 	{
 		printf("#######  %s\n", str);
 	}
@@ -149,11 +153,80 @@ Status search_contact(AddressBook *address_book)
 }
 
 Status edit_contact(AddressBook *address_book)
-{
-	/* Add the functionality for edit contacts here */
+{	
+
+	int index;
+
+	//Check if there are contacts available
+	if (address_book->count == 0) 
+	{
+		printf("No contacts available to edit.\n");
+		return e_fail;
+	}
+
+	//Ask user which contact to edit
+	printf("Enter the contact serial number to edit: ");
+	scanf("%d", &index);
+
+	//Validate index
+	if (index < 0 || index >= address_book->count)
+	{
+		printf("Invalid contact index. \n");
+		return e_fail;
+	}
+
+	//Display current contact info
+	printf("\nCurrent Contact Details:\n");
+	printf("Name: %s\n", address_book->list[index].name[0]);
+	printf("Phone: %s\n", address_book->list[index].phone_numbers[0]);
+	printf("Email: %s\n", address_book->list[index].email_addresses[0]);
+
+	//Prompt for new values
+	printf("\nEnter new name: ");
+	scanf("%s", address_book->list[index].name[0]);
+
+	printf("Enter new phone number: ");
+	scanf("%s", address_book->list[index].phone_numbers[0]);
+
+	printf("Enter new email address: ");
+	scanf("%s", address_book->list[index].email_addresses[0]);
+
+	//Confirm edit
+	printf("Contact updated successfully.\n");
 }
 
 Status delete_contact(AddressBook *address_book)
 {
-	/* Add the functionality for delete contacts here */
+	int index;
+
+	//Check if there are contacts available
+	if (address_book->count == 0)
+	{
+		printf("No contacts available to delete.\n");
+		scanf("%d", &index);
+	}
+
+	//Ask which contact to delete
+	printf("Enter the contact serial number to delete: ");
+	scanf("%d", &index);
+
+	//Validate index
+	if (index < 0 || index >= address_book->count)
+	{
+		printf("Invalid contact index.\n");
+		return e_fail;
+	}
+
+	//Shift contacts up in the array
+	for (int i = index; i < address_book->count - 1; i++)
+	{
+		address_book->list[i] = address_book->list[i + 1];
+	}
+
+	//Reduce total contact count
+	address_book->count--;
+
+	printf("Contact deleted successfully.\n");
+
+	return e_success;
 }
