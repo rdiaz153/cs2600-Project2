@@ -130,7 +130,7 @@ Status load_file(AddressBook *address_book)
 					else if(i >= 7 && i <= 11)
 					{
 						int length;
-						if (i == 1) {
+						if (i == 11) {
 							length = (int)strlen(start);
 						} else {
 							length = (int)(end - start);
