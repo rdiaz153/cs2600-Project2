@@ -40,6 +40,17 @@ Status load_file(AddressBook *address_book)
 			free(address_book->list);
 			return e_fail;
 		}
+		
+		//If the file is empty, treat it as 0 contacts.
+		int contactCount;
+		if(fscanf(address_book->fp, "%d\n", &contactCount) != 1) {
+			fclose(address_book->fp);
+			address_book->fp = NULL;
+			address_book->count = 0;
+			return e_success;
+		}
+
+		address_book->count = 0;
 
 		char buffer[420];
 		while (fgets(buffer, sizeof(buffer), address_book->fp) != NULL)
@@ -64,6 +75,7 @@ Status load_file(AddressBook *address_book)
 			address_book->list[address_book->count].si_no = 0;
 			buffer[strcspn(buffer, "\n")] = '\0'; // Remove newline character if present
 			char *start = buffer;
+
 			for(int i = 0; i < 12; i++)
 			{
 				char *end = strchr(start, FIELD_DELIMITER);
@@ -73,47 +85,68 @@ Status load_file(AddressBook *address_book)
 					printf("Line %d is malformed: %s\n", address_book->count + 1, buffer);
 					fclose(address_book->fp);
 					return e_fail;
-				}
-				if(i == 11)
-				{					
-					if(isdigit(start[0]))
+				} // changing si_no to be the first index (to help later functions)
+				if (i == 0) {
+					if(isdigit(start[0])) {
 						address_book->list[address_book->count].si_no = atoi(start);
-					else
-					{
-						printf("Invalid si_no: %s\n", buffer);
+					} else {
+						printf("Invalid serial number: %s\n", buffer);
 						fclose(address_book->fp);
 						return e_fail;
 					}
+					start = end + 1;
 				}
-				else
+				else if (i == 1)
 				{
 					int length = end - start;
-					if(i == 0)
+					if(!length_check(length, NAME_LEN))
 					{
-						if(!length_check(length, NAME_LEN))
-						{
-							fclose(address_book->fp);
-							return e_fail;
-						}
+						fclose(address_book->fp);
+						return e_fail;
+					}
+
+					if (length == 1 && start[0] == ' ') {
+						address_book->list[address_book->count].name[0][0] = '\0';
+					} else {
 						strncpy(address_book->list[address_book->count].name[0], start, length);
 					}
-					else if(i >= 1 && i <= 5)
+					
+					start = end + 1;
+				} else if(i >= 2 && i <= 6)
 					{					
+						int length = end - start;
 						if(!length_check(length, NUMBER_LEN))
 						{
 							fclose(address_book->fp);
 							return e_fail;
 						}
-						strncpy(address_book->list[address_book->count].phone_numbers[i - 1], start, length);
+						if (length == 1 && start[0] == ' ')  { // if empty string, enter a space
+						address_book->list[address_book->count].phone_numbers[i - 2][0] = '\0';
+						} else {
+							strncpy(address_book->list[address_book->count].phone_numbers[i - 2], start, length);
+						}
+						start = end + 1;
 					}
-					else if(i >= 6 && i <= 10)
+					else if(i >= 7 && i <= 11)
 					{
+						int length;
+						if (i == 1) {
+							length = (int)strlen(start);
+						} else {
+							length = (int)(end - start);
+						}
 						if(!length_check(length, EMAIL_ID_LEN))
 						{
 							fclose(address_book->fp);
 							return e_fail;
 						}
-						strncpy(address_book->list[address_book->count].email_addresses[i - 6], start, length);
+						if (length == 1 && start[0] == ' ') {
+							address_book->list[address_book->count].email_addresses[i - 7][0] = '\0';
+						} else {
+							strncpy(address_book->list[address_book->count].email_addresses[i - 7], start, length);
+						}
+						if (i < 11)
+						start = end + 1;
 					}
 					else
 					{
@@ -121,9 +154,6 @@ Status load_file(AddressBook *address_book)
 						fclose(address_book->fp);
 						return e_fail;
 					}
-					start = end + 1;
-
-				}
 			}
 			address_book->count++;
 			if (address_book->count >= capacity)
@@ -153,8 +183,8 @@ Status load_file(AddressBook *address_book)
 			free(address_book->list);
 			return e_fail;
 		}
-		address_book->fp = fp;
-		fclose(address_book->fp);
+		fclose(fp);
+		address_book->fp = NULL;
 	}
 
 	return e_success;
@@ -175,6 +205,13 @@ Status save_file(AddressBook *address_book)
 		return e_fail;
 	}
 
+	int ret = fprintf(address_book->fp, "%d\n", address_book->count);
+	if(!write_error_check(ret))
+	{
+		fclose(address_book->fp);
+		return e_fail;
+	}
+
 	for(int i = 0; i < address_book->count; i++)
 	{
 		for(int j = 0; j < 12; j++)
@@ -183,34 +220,39 @@ Status save_file(AddressBook *address_book)
 			if(j == 0)
 			{
 				
-				ret = fprintf(address_book->fp, "%s,", address_book->list[i].name[0]);
+				ret = fprintf(address_book->fp, "%d,", address_book->list[i].si_no);
 				if(!write_error_check(ret))
 				{
 					fclose(address_book->fp);
 					return e_fail;
 				}
 			}
-			else if(j >= 1 && j <= 5)
+			else if(j == 1)
 			{
-				ret = fprintf(address_book->fp, "%s,", address_book->list[i].phone_numbers[j - 1]);
+				ret = fprintf(address_book->fp, "%s,", strlen(address_book->list[i].name[0]) > 0 ? address_book->list[i].name[0] : " ");
 				if(!write_error_check(ret))
 				{
 					fclose(address_book->fp);
 					return e_fail;
 				}
 			}
-			else if(j >= 6 && j <= 10)
+			else if(j >= 2 && j <= 6)
 			{
-				ret = fprintf(address_book->fp, "%s,", address_book->list[i].email_addresses[j - 6]);
+				ret = fprintf(address_book->fp, "%s,", strlen(address_book->list[i].phone_numbers[j - 2])> 0 ? address_book->list[i].phone_numbers[j - 2] : " ");
 				if(!write_error_check(ret))
 				{
 					fclose(address_book->fp);
 					return e_fail;
 				}
 			}
-			else if(j == 11)
+			else if(j >= 7 && j <= 11)
 			{
-				ret = fprintf(address_book->fp, "%d\n", address_book->list[i].si_no);
+				if (j < 11) {
+					ret = fprintf(address_book->fp, "%s,", strlen(address_book->list[i].email_addresses[j - 7])> 0 ? address_book->list[i].email_addresses[j - 7] : " ");
+				} else {
+					ret = fprintf(address_book->fp, "%s\n", strlen(address_book->list[i].email_addresses[j - 7])> 0 ? address_book->list[i].email_addresses[j - 7] : " ");
+				}
+
 				if(!write_error_check(ret))
 				{
 					fclose(address_book->fp);
@@ -235,6 +277,7 @@ Status save_file(AddressBook *address_book)
 		printf("Error closing file: %s\n", strerror(errno));
 		return e_fail;
 	}
+	address_book->fp = NULL;
 
 	return e_success;
 }
