@@ -9,7 +9,7 @@
 
 #define WINDOW_SIZE						5
 
-typdef enum{
+typedef enum{
  EXACT = 0,
  PARTIAL = 1
 }SearchModes;
